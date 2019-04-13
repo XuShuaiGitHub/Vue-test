@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="./js/vue.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <query-type :nav="nav"></query-type>
+        <item-list :lists="lists"></item-list>
+        <choose-info @change="multify"></choose-info>
+    </div>
+
+    <script>
+        const bus = new Vue();
+
+        Vue.component("query-type",{
+            template: `
+                <div class="query-type">
+                    <ul class="tabs">
+                        <li v-for="(item,index) in nav" @click="appear(index)">
+                            <span>{{item}}</span>
+                        </li>
+                    </ul>
+                </div>
+            `,
+            props: {
+                nav:{
+                    type: Array,
+                }
+            },
+            methods: {
+                appear(para){
+                    bus.$emit('appear',para)
+                },
+            },
+        })
+
+
+
+
+        Vue.component("choose-info",{
+            template: `
+            <div class="detail-choose"  @click="hidden" v-show="on">
+                <ul v-show="curr===0">
+                    <li v-for="(member1,index) in area" @click="change(member1)">{{member1}}</li>
+                </ul>
+                <ul v-show="curr===1">
+                    <li v-for="(member2,index) in price" @click="change(member2)">{{member2}}</li>
+                </ul>
+                <ul v-show="curr===2">
+                    <li v-for="(member3,index) in houseType" @click="change(member3)">{{member3}}</li>
+                </ul>
+                <ul v-show="curr===3">
+                    <li v-for="(member4,index) in more" @click="change(member4)">{{member4}}</li>
+                </ul>
+            </div>
+            `,
+            data(){
+                return{
+                    on:false,
+                    curr: false,
+                    area:["不限","金水","中原","郑东新区","管城回族区","二七","惠济","高新","经开区","荥阳市"],
+                    price: ["不限","60万以下","60-80万","80-100万","100-150万","150-200万","200-300万","300-400万"],
+                    houseType: ["一室","二室","三室","四室","五室","五室以上"],
+                    more: ["朝东","朝南","朝西","朝北","南北"]
+                }
+            },
+            methods: {
+                change(data){
+                    this.$emit('change',this.curr,data);
+                    this.on=false;
+                },
+                hidden(){
+                    this.curr=false;
+                }
+            },
+            created() {
+                bus.$on('appear', (val)=>{
+                    this.curr = val;
+                    this.on=true;
+                })
+            }
+        })
+
+
+
+
+        Vue.component("item-list",{
+            template: `
+            <div class="itemList">
+                <ul>
+                    <list v-for="(part,index) in lists" :portion="part"></list>
+                </ul>
+            </div>
+            `,
+            props: ["lists"],
+        })
+
+        Vue.component("list",{
+            template: `
+            <li>
+                <div class="content">
+                    <div class="img">
+                        <img :src="portion.img_url" />
+                    </div>
+                    <div class="right">
+                        <p class="title">{{portion.title}}</p>
+                        <p class="tags">{{portion.tags}}</p>
+                        <p class="price">{{portion.price}}</p>
+                    </div>
+                </div>
+            <li>
+            ` ,
+            props: ["portion"],
+        })
+
+
+        const example= new Vue({
+            el: "#app",
+            data: {
+                msg: null,
+                nav: ['户型', '价格', '区域', '更多'],
+                lists: [
+                {
+                    title: '海上香颂 纯南 精装一房两厅 全明户型 前后无遮挡',
+                    tags: '1室2厅/62m²/南/海上香颂',
+                    price: '102万',
+                    img_url:
+                    'https://image1.ljcdn.com/410100-inspection/7ffca634-bf12-41e9-9e83-93b196f44886.jpg!m_fill,w_210,h_164,lg_north_west,lx_0,ly_0,l_rorate_logo,f_jpg,ls_50'
+                },
+                {
+                    title: '康桥精装朝南小两居 视野开阔无遮挡 业主急出',
+                    tags: '1室2厅/62m²/南/海上香颂',
+                    price: '52万',
+                    img_url:
+                    'https://image1.ljcdn.com/410100-inspection/prod-29df9933-c3f7-4471-a5ab-8b446fd57a00.jpg!m_fill,w_210,h_164,lg_north_west,lx_0,ly_0,l_rorate_logo,f_jpg,ls_50'
+                },
+                {
+                    title: '三期联排别墅东边户 临湖 院子300平 装修好',
+                    tags: '1室2厅/62m²/南/海上香颂',
+                    price: '150万',
+                    img_url:
+                    'https://image1.ljcdn.com/410100-inspection/5dd1c946-942e-4a02-a115-d1a1e2a0ad5a.jpg!m_fill,w_210,h_164,lg_north_west,lx_0,ly_0,l_rorate_logo,f_jpg,ls_50'
+                },
+                {
+                    title: '精装修 家具家电留下 双气大三房 通透户型 急售',
+                    tags: '1室2厅/62m²/南/海上香颂',
+                    price: '88万',
+                    img_url:
+                    'https://image1.ljcdn.com/410100-inspection/prod-d41797c0-6ca7-48f7-b1db-bec5eb64aa15.jpg!m_fill,w_210,h_164,lg_north_west,lx_0,ly_0,l_rorate_logo,f_jpg,ls_50'
+                }],
+            },
+            methods: {
+                multify(argu1,argu2){
+                    console.log(argu1);
+                    console.log(argu2);
+                    // this.nav.splice(argu1,1,argu2);
+                    Vue.set(this.nav,argu1,argu2);
+                    console.log(this.nav);
+                }
+            }
+        })
+    </script>
+</body>
+</html>
